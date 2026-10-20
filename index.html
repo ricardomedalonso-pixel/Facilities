@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Shopee Facilities Intelligence - Power BI &amp; Operations Portal</title>
+    <meta name="description" content="Painel executivo e operacional de gestão de ocorrências de Facilities, indicadores de SLA, custos de manutenção, medidas DAX, automação e base de dados dos Hubs e CDs Shopee." />
+    
+    <!-- PWA & Mobile Web App Meta -->
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <meta name="theme-color" content="#172554" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Shopee Fac" />
+    <meta name="application-name" content="Shopee Fac" />
+    
+    <!-- OpenGraph & Social Cards -->
+    <meta property="og:title" content="Shopee Facilities Intelligence - Power BI &amp; Operations Portal" />
+    <meta property="og:description" content="Painel executivo e operacional de gestão de ocorrências de Facilities, indicadores de SLA, custos de manutenção, medidas DAX, automação e base de dados dos Hubs e CDs Shopee." />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="/logo-shopee-1024.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Shopee Facilities Intelligence" />
+    <meta name="twitter:description" content="Painel executivo e operacional de gestão de Facilities Shopee &amp; Cushman Wakefield." />
+    <meta name="twitter:image" content="/logo-shopee-1024.png" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+    <script>
+      // Service worker registration
+      if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').then((reg) => {
+            console.log('Shopee Facilities PWA Service Worker registrado com sucesso:', reg.scope);
+          }).catch((err) => {
+            console.warn('Erro ao registrar Service Worker:', err);
+          });
+        });
+      }
+    </script>
+  </body>
+</html>

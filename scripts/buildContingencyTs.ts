@@ -1,0 +1,313 @@
+import fs from 'fs';
+import { CADASTRO_CDS, getMacroRegion } from '../src/data/cadastrosCDs';
+
+const rawData = `Registro	Data	Unidade	Cidade	Região	Analista Solicitante	Descrição da Ocorrência	Impacto Operacional	Tipo de Ocorrência	Criticidade	Fornecedor	Ocorrência	Hora Abertura Ocorrência	Hora Acionamento para Atendimento	Hora Normalização da Ocorrência	Status	Valor SPOT	Nº Manusis	MTTA (hh:mm)	MTTR (hh:mm)	SLA	Semáforo SLA	Tempo em Aberto (hh:mm)	Alerta SLA	Causa Raiz	Ação Executada	Responsável Acompanhamento	Reincidência 30d	Data de Encerramento	Responsável pela Abertura
+CONT-001	17-set-26	HUB-NFU-02	Nova Friburgo	Minas Gerais 03	Daniela Domingues	Gerador gera alarme recorrentes, liga e desliga,baixa tensão	Parcial	Elétrico	4	Tecnogera	Aguardando visita técnica, Rodrigo Tecnogera ficou de passar contato da parte operacional	23:39	23:44	23:55	Encerrado		OM 240551	0:05	0:16	Dentro SLA	●	0:10	No prazo	Em investigação	Agendar manutenções preventivas recorrentes	Allan (Shopee)	0		
+CONT-002	18-set-26	SOC-SP06	Cadastrar unidade	Cadastrar unidade	Gustavo Oliveira	Está com notificação de sem energia, mas após confirmação com SiteLeader não houve nenhum problema com elétrica. QTA THG 167SOC-SP6 	Nenhum	Elétrico	3	Thorio	Aguardar site lider ou analista para abrir a OM para executar o serviço	0:35	0:55	1:35	Encerrado		SS 48276	0:20	1:00	Dentro SLA	●	0:40	No prazo				0		
+CONT-003	18-set-26	HUB-LSP-37	MOGI MIRIM	São Paulo 4	Gustavo Oliveira	Gerador THG 536 está com o alerta de baixa pressão de óleo	Nenhum	Elétrico	3	Thorio	Aguardar site lider ou analista para abrir a OM para executar o serviço	19:42	19:50	20:00	Encerrado		SS 48271	0:08	0:18	Dentro SLA	●	0:10	No prazo				0		
+CONT-004	20-set-26	LAM-002	Cadastrar unidade	Cadastrar unidade	Gustavo Oliveira	Tomadas do rack de TI sem energia	Total	Elétrico	2	Mantedendor Interno	Aberta a solicitação 	22:30	22:45	23:30	Encerrado		SS 48367	0:15	1:00	Dentro SLA	●	0:45	No prazo				0		
+CONT-005	21-set-26	HUB-LSP-41	Itapevi	São Paulo 2	Daniela Domingues	Gerador com alarme acusando baixo combustível	Nenhum	Elétrico	2	Thorio	Aberta a solicitação 	19:29	20:09	3:06	Encerrado		OM 243452	0:40	7:37	Dentro SLA	●	6:57	No prazo				0	22-set-26	
+CONT-006	22-set-26	HUB-LPE-06	Guaranhuns	Nordeste 05	Leticia	Niveladora sem funcionamento, esta travada	Total	Elétrico	2	Vitha Facility	analista Leticia me acionou, fornecedor buscando técnico	3:07	3:18	9:35	Encerrado		SS 48523	0:11	6:28	Dentro SLA	●	6:16	No prazo	Problema resovido 		Leticia	0	22-set-26	Daniela
+CONT-007	23-set-26	SOC-SP7	Louveira	Sudeste SP	Gustavo Oliveira	 Falta de energia em pontos da doca	Parcial	Elétrico	3	Proprio Condominio	Entrado em contato com o Romulo (Eletricista)	6:38	6:45	7:10	Encerrado		SS 48715	0:07	0:31	Dentro SLA	●	0:25	No prazo	Disjuntor desarmando, refletor em curto	Fazer a substituição do refletor		0		
+CONT-008	23-set-26	HUB-LMG-56	Governador Valadares	Minas Gerais	Daniela Domingues	Disjuntor desarmando, quadro elétrico com temperatura elevada	Parcial	Elétrico	2	JLL	Aberta a OM, e acionada a empresa JLL para atendimento	19:05	19:11	21:50	Encerrado		OM 249137	0:06	2:45	Dentro SLA	●	2:39	No prazo			Daniela Domingues	0		
+CONT-009	24-set-26	HUB-LMG-63	Nova Serrana	Minas Gerais	Ricardo Alonso	Gerador com tanque em 17%	Nenhum	Combustivel	2	Thorio	Informado no grupo a nescecidade do abastecimento	14:34	14:47	15:50	Encerrado		 OM 250474	0:13	1:16	Dentro SLA	●	1:03	No prazo	Nível de combustivel	Criar conograma de abastecimento, sensor não esta marcando adequadamente	Ricardo	0		
+CONT-010	24-set-26	HUB-LAM-002	Manaus	Nordeste 03	Gustavo Oliveira	Falta de energia geral e o gerador não acionou	Total	Elétrico	1	Thorio	Acionado via grupo a Thorio, acionou o técnico que está indo ao local	22:17	22:14	23:08	Encerrado		OM 250703	23:57	0:51	Dentro SLA	●	0:54	No prazo	Falta de energia da concessionária	Foi verificado problema no disjuntor onde não deixa o gerador migrar para energia da concessionaria	Gustavo	0		
+CONT-011	25-set-26	HUB-LCE-01	Fortaleza	Nordeste 03	Daniela Domingues	Falta de energia geral , abastecimento gerador	Nenhum	Combustivel	3	Thorio	Analista acionou o time Thório 	23:27	23:00	23:41	Encerrado		 OM 251191	23:33	0:13	Dentro SLA	●	0:40	No prazo	Falta de energia da concessionária	Foi completado o tanque do gerador, para não parar operação com a falta de energia	Daniela Domingues	0		
+CONT-012	26-set-26	HUB-LPI-02	Teresina	Nordeste 04	Ricardo Alonso	Nivel de combustivel baixo	Nenhum	Combustivel	3	Thorio	Informado ao Luan responsavel da Thorio sobre nivel de abastecimento	9:02	9:04	9:42	Encerrado		SS 48302	0:02	0:40	Dentro SLA	●	0:37	No prazo	Em investigação	Informado pelo Luan que tanque esta com 1500 litro não sendo necessario fazer o abastecimento do mesmo	Ricardo Alonso	0		
+CONT-013	26-set-26	HUB-LRJ-29	Rio de Janeiro	Rio de Janeiro 01	Elton	Quadro de energia inoperante	Parcial	Elétrico	2	Alamo	Fornecedor em deslocamento	12:18	13:02	15:50	Encerrado		OM 251786	0:44	3:31	Dentro SLA	●	2:48	No prazo	Em investigação	Já resolvemos o problema! O disjuntor desarmou, religuei tudo novamente e fizemos os testes, já está tudo funcionando - Vitor da empresa Álamo	Elton	0		
+CONT-014	26-set-26	HUB-LPE-11	Jaboatão dos Guararapes	Nordeste 01	Gustavo Oliveira	Abastecimento de gerador	Nenhum	Combustivel	3	Tecnogera	Solicitado abastecimento via whatsapp	21:50	21:30	14:35	Encerrado		OM 251848	23:40	40:45	Fora SLA	●	41:04	ESTOURADO			Gustavo	0	28-set-26	Gustavo
+CONT-015	26-set-26	HUB-LAM-002	Manaus	Nordeste 03	Gustavo Oliveira	Falta de energia da concessionária, o gerador está acionado mas sem gerar energia	Total	Elétrico	1	Thorio	Solicitado atendimento da thorio via grupo de emergencias	23:19	23:29	0:30	Encerrado		OM 251856	0:10	1:10	Dentro SLA	●	1:01	No prazo	Falha de equipamento	Acionado o técnico que fez a troca do disjuntor para que execute a garantia	Gustavo	1		
+CONT-016	27-set-26	HUB-LPI-01	Teresina	Nordeste 04	Elton	Portão principal saiu dos trilhos	Parcial	Civil	2	JLL	Fornecedor em deslocamento	7:11	7:36	11:26	Encerrado		OM 252497	0:25	4:15	Dentro SLA	●	3:49	No prazo	Falha de equipamento	Porão desamassado e colocado no lugar	Elton	0		
+CONT-017	27-set-26	HUB-LPE-02	Cabo de Santo Agostinho	Nordeste 01	Elton	Abastecimento de gerador	Nenhum	Combustivel	3	Thorio	Solicitado abastecimento via whatsapp	11:40	11:41	21:00	Encerrado		OM 252501	0:01	9:19	Dentro SLA	●	9:19	No prazo	Falta de energia da concessionária	Abastecimento do gerador previnindo parada do equipamento	Elton	0		
+CONT-018	27-set-26	HUB-LPE-03	Recife	Nordeste 01	Elton	Falta de energia geral e o gerador não acionou	Total	Elétrico	1	Thorio	Equipe em deslocamento	18:26	18:34	22:02	Encerrado		OM 252525	0:08	3:36	Dentro SLA	●	3:28	No prazo	Falha de equipamento	Não foi disgnosticada	Daniela Domingues	0	27-set-26	Elton
+CONT-019	28-set-26	HUB-LCE-05	Fortaleza	Nordeste 03	Gustavo Oliveira	Gerador inoperante durante falta de energia	Total	Elétrico	1	Thorio	Acionado fornecedor via grupo, o mesmo está em contato com o SL do HUB	20:48	20:50	21:20	Encerrado		OM 252928	0:02	0:31	Dentro SLA	●	0:30	No prazo	Erro operacional	Feito o reset do gerador e o mesmo voltou a funcionar	Gustavo	0		
+CONT-020	28-set-26	HUB-LPA-03	Anamindeua	Nordeste 04	Gustavo Oliveira	Após quedas de energia por conta da chuva, o gerador está acionado mas diversas áreas sem energia	Parcial	Elétrico	1	GPS	Acionado fornecedor indicado pelo analista e o mesmo está acionando técnico na região	20:48	20:53	10:00	Encerrado		OM 252932	0:05	13:12	Fora SLA	●	13:07	ESTOURADO	Falta de energia da concessionária	Curto na rede externa com queima de diversor DR's	Gustavo	0	29-set-26	Gustavo
+CONT-021	28-set-26	SOC-CE-003	Fortaleza	Nordeste 04	Gustavo Oliveira	Abastecimento de gerador	Nenhum	Combustivel	2	Thorio	Acionamento do fornecedor para abastecimento, gerador em operando a menos de 30% de combustivel	21:13	21:12	23:40	Encerrado		OM 252947	23:59	2:27	Dentro SLA	●	2:28	No prazo			Gustavo	0		
+CONT-022	29-set-26	HUB-LSP-008	TAUBATE	São Paulo 8	Gustavo Oliveira	Portão principal emperrado sem conseguir abertura	Total	Serralheria	1	GPS	Acionamento da equipe da GPS para envio do serralheiro	5:50	5:54	12:03	Encerrado		OM 253073	0:04	6:13	Fora SLA	●	6:09	ESTOURADO			Gustavo	0	29-set-26	Gustavo
+CONT-023	29-set-26	HUB-LRJ-02	Nova Friburgo	Minas Gerais 03	Daniela Domingues	Fui acionada via ligação Thais, simulação de atendimento falta de energia	Nenhum	Elétrico	1	Thorio	Simulação concluída e abertura de OM	19:38	19:32	20:00	Encerrado		OM 253404	23:54	0:22	Dentro SLA	●	0:28	No prazo			Daniela Domingues	0		
+CONT-024	29-set-26	HUB-LSP-008	TAUBATE	São Paulo 8	Daniela Domingues	Quadro principal aquecendo, oscilação de energia.	Parcial	Elétrico	1	GPS	Acionamento da equipe da GPS para envio de eletricista	20:47	20:28	2:25	Encerrado		OM 253419	23:41	5:37	Fora SLA	●	5:57	ESTOURADO			Daniela Domingues	1		
+CONT-025	29-set-26	HUB-LSP-008	TAUBATE	São Paulo 8	Daniela Domingues	Oscilação de energia, gerador não entrou	Total	Elétrico	1	Thorio	Acionado a empresa Thório 	22:14	20:53	21:41	Encerrado		OM 253432	22:39	23:27	Fora SLA	●	0:48	No prazo			Daniela Domingues	1		
+CONT-026	29-set-26	HUB-LPA-03	Anamindeua	Nordeste 04	Flavia Lacerda	Rampa da doca sem funcionamento	Total	Elétrico	1	JLL	Acionado empresa JLL, para envio de eletricista	23:07	22:37	2:40	Encerrado		 OM 253435	23:30	3:33	Dentro SLA	●	4:03	CRÍTICO — vence em breve	Causa externa	A empresa JLL não conseguiu solucinar o problema, a analista Juliana informou que iria acionar a fabricante Metaro para o atendimento	Daniela Domingues	1	30-set-26	Daniela
+CONT-027	30-set-26	HUB-LRJ-21	São Pedro da Aldeia	Rio de Janeiro 01	Daniela Domingues	Abastecimento de gerador	Nenhum	Combustivel	3	Thorio	Abastecimento gerador, completar tanque local sem energia	4:07	4:35	15:00	Encerrado		SS 49756	0:28	10:52	Dentro SLA	●	10:25	No prazo			Daniela Domingues	0	30-set-26	Daniela
+CONT-028	30-set-26	HUB-LRJ-05	Macaé	Rio de Janeiro 01	Daniela Domingues	Oscilação de energia, gerador não entrou	Total	Elétrico	1	Thorio	Acionado a empresa Thório 	3:07	3:07	10:18	Encerrado		SS 49753	0:00	7:10	Fora SLA	●	7:10	ESTOURADO	Falta de energia da concessionária	Foi acinado a concessionaria de energia devido ao relogio esta apagando, sera verificado se o problema esta no relogio.	Marcelly (Shopee)	0	30-set-26	
+CONT-029	2-out-26	HUB-LSP-37	MOGI MIRIM	São Paulo 4	Izabel Sergio	Queda de DR's e falta de energia	Total	Elétrico	1	Brasil Serviços	Acionada a empresa Brasil	20:03	20:23	22:23	Encerrado		OM 256441	0:20	2:19	Dentro SLA	●	2:00	No prazo	Falha de equipamento	Curto circuito nos refletores externos desarmando o DR central	Gustavo	1	02-out-26	Gustavo
+CONT-030	3-out-26	HUB- LRN-04	PARNAMIRIM	Nordeste 03	Marcela Brito	Luminárias sem funcionamento	Total	Elétrico	1	Vitha Facility	Acionada a empresa Vitha	18:05	21:00	1:25	Encerrado		SS 50219	2:55	7:19	Fora SLA	●	4:25	CRÍTICO — vence em breve	Em investigação	Acionado eletricista e empresa Thorio gerador	Daniela Domingues	0	04-out-26	Daniela
+CONT-031	3-out-26	HUB-LSP-62	PIRACICABA	São Paulo 4	Izabel Sergio	Caixa de gordura e banheiros transbordando 	Parcial	Hidráulico	1	GPS	Acionada a empresa GPS	18:08	22:30	23:36	Encerrado		OM 257109	4:22	5:28	Fora SLA	●	1:06	No prazo	Falta de manutenção preventiva	Acionado a empresa GPS que efetuou a limpeza	Daniela Domingues	0	03-out-26	Daniela
+CONT-032	3-out-26	HUB-LPR-26	Toledo	Sul 1	Francivania Oliva	Falta de água	Total	Hidráulico	1	JLL	Acionada a empresa NB construção	20:18	22:32	23:43	Encerrado		OM  257110	2:14	3:25	Dentro SLA	●	1:10	No prazo	Em investigação	Acionado JLL,técnico fará atendimento pela manhã - Empresa não conseguiu enviar o técnico- foi alinhado atenidmento para o primeiro horário com a empresa JLL	Daniela Domingues	0		Daniela
+CONT-033	3-out-26	HUB-LPR-24	São Jose dos Pinhais	Sul 4	Melissa Kamei	Falta de água	Total	Hidráulico	1	JLL	Acionada empresa JLL	19:49	21:24	22:23	Encerrado		OM 257100	1:35	2:34	Dentro SLA	●	0:58	No prazo	Erro operacional	Acionado empresa JLL,após abertura do registro voltou a água	Daniela Domingues	0	03-out-26	Daniela
+CONT-034	3-out-26	HUB-LRS-06	Santa Maria	Sul 2	Milena Maia	Portão caiu	Parcial	Mecânico	1	Home Safe	Acionado fornecedor Home Safe, foi feito uma paliativo portão no manual, necessário refazer motor	18:14	21:30	22:25	Encerrado		OM 257107	3:16	4:10	Dentro SLA	●	0:55	No prazo	Causa externa	Acionado fornecedor fornecedor Home Safe, levantou o portão e colocou no lugar	Daniela Domingues	0	03-out-26	Daniela
+CONT-035	3-out-26	HUB-LRJ-05	Macaé	Rio de Janeiro 01	Marcelly Silva	Instalação do gerador	Nenhum	Elétrico	4	Thorio	Acionado empresa Thório	21:12	1:10	13:14	Encerrado		OM 257135	3:58	16:01	Dentro SLA	●	36:04	ATENÇÃO — prazo se aproximando	Falha de equipamento	Acionado a empresa Thório, acompanhando a instalação, devido a falta de cabo se estendeu mais a instalação	Daniela Domingues	1	04-out-26	Daniela
+CONT-036	3-out-26	SOC-CE-003	Cadastrar unidade	Cadastrar unidade	Chris Macedo	Quadro sem tensão -Nobreak 	Parcial	Elétrico	1	GPS	Acionado empresa GPS	1:25	21:52	22:08	Encerrado		OM 257137	20:27	20:43	Fora SLA	●	0:16	No prazo	Falha de equipamento	Acionado empresa GPS, Reparo na chave de transferência	Daniela Domingues	0	03-out-26	Daniela
+CONT-037	4-out-26	HUB-LPR-12	Foz do Iguaçu	Sul 1	Guilherme Vastay	Falta de energia geral e o gerador não acionou	Total	Elétrico	1	Tecnogera	Acionado empresa Tecnogera	0:09	0:09	5:00	Encerrado		OM 257241	0:00	4:51	Dentro SLA	●	4:51	CRÍTICO — vence em breve	Falta de energia da concessionária	Acionado empresa Tecnogera, previsão de atendimento 07:00	Daniela Domingues / Elton	0	04-out-26	Daniela
+CONT-038	4-out-26	HUB-LCE-04	Juazeiro do Norte	Nordeste 03	Marcela Brito	sem água na caixa d'água	Total	Hidráulico	1	Inovação Construtiva	Acionado Fornecedor INOVAÇÃO	9:35	10:18	15:20	Encerrado			0:43	5:45	Fora SLA	●	5:01	ESTOURADO	Erro operacional	Agendado caminhão pipa para atenidmento no primeiro horário do dia 05-10-26	Elton	0	04-out-26	Elton
+CONT-039	4-out-26	HUB-LPR-26	Toledo	Sul 1	Francivania Oliva	Entrega de galões de água	Parcial	Hidráulico	1	NB Construções	Acionado fornecedor NB construção	17:36	19:06	21:47	Encerrado		OM 257277	1:30	4:10	Dentro SLA	●	2:40	No prazo	Falha de equipamento	Feito paliativo na contatora que voltou a funcionar	Gustavo	1		Gustavo
+CONT-040	5-out-26	HUB-LPR-26	Toledo	Sul 1	Francivania Oliva	Verificação da troca da contatora	Nenhum	Elétrico	4	JLL	Será feita a verificação da necessidade de troca em preventiva	23:33	23:41	14:00	Encerrado		OM 257302	0:08	86:27	Fora SLA	●	86:19	ESTOURADO	Falha de equipamento	Atendimento em preventiva	Gustavo	0	09-out-26	Gustavo
+CONT-041	6-out-26	HUB-LSP-83	Taubaté	São Paulo 8	Mariana Menossi	Água retornando pelo ralo do banheiro	Parcial	Hidráulico	2	GPS	Agendado com a GPS o atendimento no primeiro horário do dia 7	20:46	22:10	10:00	Encerrado		OM 258085	1:24	61:13	Fora SLA	●	59:49	ESTOURADO	Causa externa	Acionado outros fornecedores locais mas nenhum conseguia atender noturno, alinhado com a analista atendimento no primeiro horário da manhã	Gustavo	0	09-out-26	Gustavo
+CONT-042	6-out-26	HUB-LPR-26	Toledo	Sul 1	Francivania Oliva	Um veículo de coleta foi em constar na doca de descarga e acabou enroscando no cabo de sustentação do cano de água do aspersor	Parcial	Climatização	2	NB Construções	Agendado com a NB construção a visita in loco no dia 7	22:06	22:08	10:00	Encerrado		OM 258092	0:02	59:54	Fora SLA	●	59:52	ESTOURADO	Erro operacional	Solicitado pela analista o agendamento para visita no primeiro horário do dia 7	Francivania 	0	09-out-26	Gustavo
+CONT-043	7-out-26	HUB-LPI-02	Teresina	Nordeste 04	Gustavo Oliveira	Solicitado abastecimento, tanque abaixo de 30%	Parcial	Elétrico	2	Thorio	Solicitado ao fornecedor que faça o abastecimento	5:40	5:44	10:00	Encerrado		OM 258596	0:04	4:19	Dentro SLA	●	4:16	No prazo	Nível de combustivel	Thorio fará o abastecimento, foi informado que o gerador esta rodando fulltime e o abastecimento é feito toda quarta-feira	Gustavo	0	07-out-26	Gustavo
+CONT-044	7-out-26	HUB- LES-16	São Mateus	Espirito Santo	Daniela Domingues	Solicitado abastecimento, tanque abaixo de 20%	Nenhum	Elétrico	3	Thorio	Solicitado ao fornecedor que faça o abastecimento	19:55	19:15	22:45	Encerrado		OM 259037	23:20	2:49	Dentro SLA	●	3:30	No prazo	Nível de combustivel	Thorio fará o abastecimento em 07/10	Daniela Domingues	0	07-out-26	Daniela
+CONT-045	11-out-26	HUB-LPE-04	Cruaru	Nordeste 01	Jose Carlos		Nenhum	Serralheria	4	NB Construções		15:55	16:00	19:45	Encerrado			0:05	3:49	Dentro SLA	●	3:45	No prazo			Damaris	0	11-out-26	Damaris
+CONT-046	9-out-26	HUB-LES-01	Itapemoirim	Espirito Santo	Guilherme Persio	Locação de gerador, falta de energia	Total	Elétrico	1	Thorio	Acionado a empresa Thorio, para locação emergencial	19:48	19:06	1:39	Encerrado		OM 260433	23:18	5:51	Fora SLA	●	6:33	ESTOURADO	Falta de energia da concessionária	verificar a possibilidade de deixar gerador in loco	Daniela Domingues	0	10-out-26	Daniela
+CONT-047	9-out-26	HUB-LMG-61	Vespasiano	Minas Gerais	Daniele Constantino	Bebedouro com vazamento	Total	Hidráulico	1	NB Construções	Acionado empresa NB, para atendimento	20:07	21:00	21:56	Encerrado		OM 260451	0:53	1:49	Dentro SLA	●	0:55	No prazo	Falta de manutenção preventiva	Acionado a empresa NB, para correção do equipamento	Daniela Domingues	0		Daniela
+CONT-048	9-out-26	HUB-LMG-49	Sete Lagoas	Minas Gerais	Daniele Constantino	Falta de energia geral e o gerador não acionou	Total	Elétrico	1	Thorio	Acionado empresa Thório	22:07	20:23	23:25	Encerrado		OM 260453	22:16	25:18	Fora SLA	●	27:01	ESTOURADO	Falta de energia da concessionária	Acionado a empresa Thório, acompanhando atendimento	Daniela Domingues	0	10-out-26	Daniela
+CONT-049	9-out-26	HUB-LMG-59	Juiz de Fora	Minas Gerais 03	Alan Augusto	Ventiladores sem funcionamento	Parcial	Elétrico	1	NB Construções	Acionada a empresa NB construção	22:15	20:27	2:11	Encerrado		OM 260454	22:12	2:11	Dentro SLA	●	5:43	ESTOURADO	Em investigação	Acionado a empresa Nb, para atendimento	Daniela Domingues	0		Daniela
+CONT-050	9-out-26	SOC-CE-03	FORTALEZA		Chris Macedo	Abastecimento gerador	Parcial	Elétrico	2	Thorio	Acionado a empresa Thorio, para abastecimento	22:27	20:28	1:50	Encerrado		OM 260458	22:01	3:22	Dentro SLA	●	5:22	No prazo	Nível de combustivel	Thorio fará o abastecimento em 09/10	Daniela Domingues	0	10-out-26	Daniela
+CONT-051	9-out-26	HUB-LSP-37	MOGI MIRIM	São Paulo 4	Izabel Sergio	Hub sem energia, desarmando o DR	Total	Elétrico	1	GPS	Acionada a empresa GPS	20:44	23:13	0:00	Encerrado		OM 260472	2:29	3:16	Dentro SLA	●	0:46	No prazo	Em investigação	Acionado a empresa GPS para verificação causa	Daniela Domingues	2	10-out-26	Daniela
+CONT-052	9-out-26	HUB-LSP-68	SÃO PAULO	São Paulo 3	João Henrique	Abastecimento gerador	Parcial	Elétrico	2	Thorio	Acionado empresa Thório	23:43	0:20	3:23	Encerrado		OM 260479	0:37	3:23	Dentro SLA	●	27:03	ESTOURADO	Nível de combustivel	Acionado a empresa Thório, para abastecimento	Daniela Domingues	0	10-out-26	Daniela
+CONT-053	11-out-26	HUB-LRJ-27	Queimados	Rio de Janeiro 02	Izabelle Mele	Problema com o fechamento do portão	Nenhum	Elétrico	2	Alamo	Acionado empresa Alamo	18:00	18:30	21:00	Encerrado		OM  261125	0:30	3:00	Dentro SLA	●	2:30	No prazo			Damaris Raffa	0	11-out-26	Gustavo
+CONT-054	11-out-26	HUB-LRJ-21	São Pedro da Aldeia	Rio de Janeiro 01	Marcelly	Abastecimento emergencial do gerador	Total	Combustivel	1	Thorio	Acionado empresa Thório	17:15	17:18	2:45	Encerrado		OM 261135	0:03	9:30	Fora SLA	●	9:27	ESTOURADO	Nível de combustivel		Damaris Raffa	1	12-out-26	Gustavo
+CONT-055	11-out-26	SOC-PE-04 	Jaboatão dos Guararapes	Nordeste 01	Chris Macedo	Queda de energia e mesmo com a entrada do gerador alguns pontos continuam sem energia		Elétrico	2	GPS	Acionado empresa GPS	9:03	9:44	11:30	Encerrado			0:41	2:27	Dentro SLA	●	1:46	No prazo			Damaris Raffa	1	11-out-26	Damaris
+CONT-056	11-out-26	SOC-ES2	Viana	Espirito Santo	Joliel	Gerador não está acionando por falta de energia	Total	Elétrico	1	Thorio	Acionado empresa Thório	9:38	9:42	14:21	Encerrado			0:04	4:43	Dentro SLA	●	4:39	CRÍTICO — vence em breve	Falha de equipamento	Efetuamos a troca do AVR e realizamos um reparo paliativo no diodo para garantir o funcionamento do equipamento hoje. Amanhã retornaremos à unidade para realizar a troca definitiva do diodo	Damaris Raffa	0	11-out-26	Damaris
+CONT-057	11-out-26	SOC- SP35	Piracicaba	Sudeste SP	Humberto	Soc está sem água	Total	Hidráulico	2	Proprio Condominio	Acionado condomínio	9:52	10:47	11:00	Encerrado			0:55	1:07	Dentro SLA	●	0:13	No prazo		Fornecimento de água foi restabelecido	Damaris Raffa	0	11-out-26	Damaris
+CONT-058	11-out-26	SOC- SP35	Piracicaba	Sudeste SP	Isabella Fernandes	Queda de energia	Total	Elétrico	1	GPS	Acionado condomínio	10:46	10:47	11:00	Encerrado			0:01	24:13	Fora SLA	●	24:13	ESTOURADO		A construtora irá verificar a queda de energia amanhã (12/10)	Damaris Raffa	0	12-out-26	Damaris
+CONT-059	11-out-26	HUB-NFU-02	Nova Friburgo	Minas Gerais 03	Alan Augusto	Iluminação e equipamentos parados	Total	Elétrico	1	Tecnogera	Acionado tecnogera	13:30	13:30	13:57	Encerrado			0:00	0:27	Dentro SLA	●	0:27	No prazo			Damaris Raffa	1	11-out-26	Damaris
+CONT-060	11-out-26	SOC-PE-04 	Jaboatão dos Guararapes	Nordeste 01	Chris Macedo	Problema com a energia continua. O trafo do condomínio está saindo	Total	Elétrico	1	GPS	Acionado GPS	13:45	13:57	16:57	Encerrado			0:12	3:12	Dentro SLA	●	3:00	No prazo	Falha de equipamento	Empresa GPS não tem acesso a área do trafo, foi acionado o responsavél do condominio para sanar o problema	Damaris Raffa	1	11-out-26	Damaris
+CONT-061	11-out-26	HUB-LPB-04	João Pessoa	Nordeste 01	Chris Macedo	Solicitação de abastecimento	Nenhum	Combustivel	2	Tecnogera	Acionado empresa Tecnogera	15:34	18:17	20:57	Encerrado			2:43	5:22	Dentro SLA	●	2:40	No prazo	Nível de combustivel	Previsão de atendimento às 19:30	Damaris Raffa	0	11-out-26	Damaris
+CONT-062	11-out-26	HUB-LSP-43	 Barretos	São Paulo 6	Juliana Pironelli	O motor parou de funcionar, portão está aberto, foi instalado o motor dia 05/10 e estamos com a garantia rodando	Nenhum	Elétrico	2	NB Construções	Acinado empresa NB	16:56	19:49	20:07	Encerrado			2:53	3:10	Dentro SLA	●	0:18	No prazo		Sem retorno	Daniela Domingues	0	11-out-26	Damaris
+CONT-063	11-out-26	HUB-LPE-08	Carpina	Nordeste 01	Leticia Mourato	Hub sem energia. Provável problema interno, pois temos energia no entorno.	Total	Elétrico	1	GPS	Acionado fornecedor local, eletricista	21:21	20:50	22:22	Encerrado		OM 261266	23:29	1:01	Dentro SLA	●	1:31	No prazo	Falta de manutenção preventiva	técnico retirou o refletor queimado e energia restabelecida	Daniela Domingues	0	11-out-26	Daniela
+CONT-064	11-out-26	HUB-LSP-63	PRAIA GRANDE	São Paulo 5	Danyela Pina	Portão descarrilhado	Parcial	Mecânico	2	GPS	Acionado a empresa GPS	22:27	21:23	0:32	Encerrado		OM 261267	22:56	2:04	Dentro SLA	●	3:09	No prazo	Falta de manutenção preventiva	Acionado a empresa GPS para reparo no portão	Daniela Domingues	0	12-out-26	Daniela
+CONT-065	11-out-26	SOC-SP18	Cadastrar unidade	Cadastrar unidade	Isabella Fernandes	Falta de água	Total	Hidráulico	2	Proprio Condominio	Acionado o condomínio local	21:08	22:44	3:05	Encerrado		OM 261268	1:36	5:57	Dentro SLA	●	4:21	No prazo	Em investigação	Acionado a construtora para verificação	Daniela Domingues	0	12-out-26	Daniela
+CONT-066	12-out-26	SOC-PE-04 	Jaboatão dos Guararapes	Nordeste 01	Chis Macêdo	Proteção de lâmpada com risco de queda	Nenhum	Elétrico	3	JLL	Alugada PTA e feito o trabalho de fixação da proteção	6:37	6:55	15:35	Encerrado			0:18	8:58	Dentro SLA	●	8:40	No prazo	Causa externa	Soltou as prisilhas de fixação	Elton	2	12-out-26	Daniela 
+CONT-067	12-out-26	HUB-LMG-36	Divinópolis	Minas Gerais	Daniele	Parte do galpão sem energia 	Parcial	Elétrico	2	Brasil Serviços	Troca do disjuntor e retirada de curto em calha	9:13	9:48	17:28	Encerrado		OM 261365	0:35	8:15	Dentro SLA	●	7:40	ATENÇÃO — prazo se aproximando	Em investigação		Elton	0	12-out-26	Elton
+CONT-068	12-out-26	HUB-LRJ-21	São Pedro da Aldeia	Rio de Janeiro 01	Marcelly Silva	Niveladora esta sem força, não sobe nem desce	Parcial	Mecânico	2	EFS Manutenções	Feito o agendamento para atendimento no primeiro horario, ha necessidade de compra de peças	10:16	11:02	17:00	Encerrado			0:46	30:43	Fora SLA	●	29:58	ESTOURADO	Em investigação		Gustavo Oliveira	0	13-out-26	Elton
+CONT-069	13-out-26	HUB-LCE-04	Juazeiro do Norte	Nordeste 03	Marcela Brito	Falta de água	Total	Hidráulico	1	Inovação Construtiva	Acionamento para entrega de caminhão pipa	2:00	2:10	3:00	Encerrado		OM 261424	0:10	1:00	Dentro SLA	●	0:49	No prazo	Causa externa		Gustavo Oliveira	1	13-out-26	Gustavo
+CONT-070	12-out-26	HUB-LPR-26	Toledo	Sul 1		Abastecimento de gerador	Total	Combustivel	1	Thorio	Acionamento da thorio para abastecimento após pane seca	21:45	21:50	6:05	Encerrado		OM 261385	0:05	8:19	Fora SLA	●	8:15	ESTOURADO	Falha do fornecedor	Problema na telemetria e também não estava aparecendo no nosso controle, solicitado a inclusão	Gustavo Oliveira	0	13-out-26	Gustavo
+CONT-071	13-out-26	HUB-LMG-49	Sete Lagoas	Minas Gerais	Izabelle Melo	Falta de energia, gerador não acionou	Total	Elétrico	1	Thorio	Acionado empresa Thório	19:05	19:06	19:36	Encerrado		OM 261836	0:01	0:31	Dentro SLA	●	0:30	No prazo	Falta de energia da concessionária	gerador estava acionado, falha devido a  iluminação	Daniela Domingues	1	13-out-26	Daniela
+CONT-072	13-out-26	HUB-LSP-83	Taubaté	São Paulo 8	Mariana Menossi	Disjuntor desarmando com frequência	Parcial	Elétrico	1	GPS	Acionado empresa GPS 	20:19	21:01	23:24	Encerrado		OM 261858	0:42	3:04	Dentro SLA	●	2:22	No prazo	Falta de manutenção preventiva	necessário adequar os quadros, sobrecarga	Daniela Domingues	0	13-out-26	Daniela
+CONT-073	14-out-26	HUB-LMG-45	Varginha	Minas Gerais 03	Alan Augusto	Esteira travada, velocidade baixa	Parcial	Mecânico	3	Meta	Acionado empresa Meta	22:41	0:39	10:40	Encerrado		OM 261904	1:58	11:58	Dentro SLA	●	34:01	ESTOURADO	Falha de equipamento	Acionado empresa Meta,agendado visita técnica para 14/10	Daniela Domingues	0	15-out-26	Daniela
+CONT-074	14-out-26	HUB-LRJ-07	Rio de Janeiro	Rio de Janeiro 02	Izabelle Melo	Portão da doca, descarrilhou	Parcial	Mecânico	3	EFS Manutenções	Acionado empresa EFS, para reparo	22:47	1:10	14:00	Encerrado		OM 261910	2:23	15:13	Dentro SLA	●	36:49	ESTOURADO	Em investigação	Acionado várias empresas, EFS fará o atendimento pela manhã	Izabelle Melo	0	15-out-26	Daniela
+CONT-075	14-out-26	HUB-LSP-07	SÃO PAULO	São Paulo 1	Isabella Fernandes	Após Queda de energia, tomadas sem funcionar e sem sinal de internet	Parcial	Elétrico	2	Mantedendor Interno	Acionado manutentor local	3:34	4:03	4:29	Encerrado		OM 262009	0:29	0:55	Dentro SLA	●	0:25	No prazo	Falta de energia da concessionária	Acionado manutentor local, falha em uma fase do nobreak	Daniela Domingues	0	14-out-26	Daniela
+CONT-076	15-out-26	HUB-LRS-03	Porto Alegre	Sul 2	Milena Maia	Queda recorrente de energia e gerador não acionou	Parcial	Elétrico	2	NB Construções	Acionado empresa Thório e NB	19:57	21:09	23:25	Encerrado		OM 265554	1:12	3:28	Dentro SLA	●	2:16	No prazo	Falta de energia da concessionária	Acionado empresa Thório e NB para diagnóstico	Daniela Domingues	0	15-out-26	Daniela
+CONT-077	15-out-26	HUB-LSP-35	JAÚ	São Paulo 7	Isabella Fernandes	Falta de internet	Parcial	Civil	2	Mantedendor Interno	Acionado manutentor local	21:00	21:48	22:10	Encerrado		OM 265557	0:48	1:10	Dentro SLA	●	0:22	No prazo	Falha de equipamento	Acionado manutentor local, equipamento reiniciado e sinal restabelecido	Daniela Domingues	0	15-out-26	Daniela
+CONT-078	16-out-26	HUB-LRS-09	Santa Rosa	Sul 3	Andressa Nascimento	falta de energia, locar gerador	Total	Elétrico	1	Tecnogera	Locação de gerador, Thório e Tecnogera não conseguem atender a demanda	4:59	5:51	6:13	Encerrado		OM 265703	0:52	1:13	Dentro SLA	●	0:22	No prazo	Falta de energia da concessionária	Acionado Thório, Tecnogera, JLL e NB	Daniela Domingues	0	16-out-26	Daniela
+CONT-079	17-out-26	HUB-LSP-100	Jundiai	São Paulo 6	Izabel Sergio	Guarita apagada	Parcial	Elétrico	1	GPS	Falta de energia na guarita e postes da rampa de acesso	19:39	19:40	22:30	Encerrado		OM 266724	0:01	2:51	Dentro SLA	●	2:49	No prazo	Causa externa	Acionado técnico da GPS	Gustavo Oliveira	0	17-out-26	Gustavo`;
+
+function parseDatePt(dtStr: string): string {
+  if (!dtStr) return '2026-10-17';
+  const parts = dtStr.trim().split('-');
+  if (parts.length < 3) return dtStr;
+  const day = parts[0].padStart(2, '0');
+  const monthMap: Record<string, string> = {
+    jan: '01', fev: '02', mar: '03', abr: '04', mai: '05', jun: '06',
+    jul: '07', ago: '08', set: '09', out: '10', nov: '11', dez: '12'
+  };
+  const mKey = parts[1].toLowerCase().slice(0, 3);
+  const month = monthMap[mKey] || '10';
+  let year = parts[2];
+  if (year.length === 2) year = '20' + year;
+  return `${year}-${month}-${day}`;
+}
+
+function parseTimeToHours(timeStr: string): number | null {
+  if (!timeStr || !timeStr.includes(':')) return null;
+  const parts = timeStr.trim().split(':');
+  const h = parseInt(parts[0], 10) || 0;
+  const m = parseInt(parts[1], 10) || 0;
+  return Math.round((h + m / 60) * 100) / 100;
+}
+
+function parseTimeToMinutes(timeStr: string): number | null {
+  if (!timeStr || !timeStr.includes(':')) return null;
+  const parts = timeStr.trim().split(':');
+  const h = parseInt(parts[0], 10) || 0;
+  const m = parseInt(parts[1], 10) || 0;
+  return h * 60 + m;
+}
+
+function formatTime(tStr: string): string {
+  if (!tStr || !tStr.includes(':')) return '08:00:00';
+  const parts = tStr.trim().split(':');
+  const h = parts[0].padStart(2, '0');
+  const m = (parts[1] || '00').padStart(2, '0');
+  return `${h}:${m}:00`;
+}
+
+// Unit normalization map
+function normalizeUnit(rawUnit: string): string {
+  let u = rawUnit.trim();
+  if (u === 'LAM-002') return 'HUB-LAM-002';
+  if (u === 'HUB- LRN-04') return 'HUB-LRN-04';
+  if (u === 'SOC-CE-03') return 'SOC-CE-003';
+  if (u === 'SOC-ES2') return 'SOC-ES02';
+  if (u === 'SOC- SP35') return 'SOC-SP35';
+  if (u === 'SOC-PE-04 ') return 'SOC-PE-04';
+  if (u === 'HUB- LES-16') return 'HUB-LES-16';
+  return u;
+}
+
+// City normalization
+function normalizeCity(cidade: string, unit: string): string {
+  const c = (cidade || '').trim();
+  if (c && c !== 'Cadastrar unidade') {
+    if (c === 'Guaranhuns') return 'Garanhuns';
+    if (c === 'Cruaru') return 'Caruaru';
+    if (c === 'Itapemoirim') return 'Itapemirim';
+    if (c === 'MOGI MIRIM') return 'Mogi Mirim';
+    if (c === 'SÃO PAULO') return 'São Paulo';
+    if (c === 'PIRACICABA') return 'Piracicaba';
+    if (c === 'TAUBATE') return 'Taubaté';
+    if (c === 'PARNAMIRIM') return 'Parnamirim';
+    if (c === 'JAÚ') return 'Jaú';
+    if (c === 'Jundiai') return 'Jundiaí';
+    if (c === 'FORTALEZA') return 'Fortaleza';
+    if (c === 'PRAIA GRANDE') return 'Praia Grande';
+    return c;
+  }
+  // If "Cadastrar unidade" or empty, infer from unit
+  if (unit.includes('SOC-SP06') || unit.includes('SOC-SP18')) return 'São Paulo';
+  if (unit.includes('LAM-002')) return 'Manaus';
+  if (unit.includes('SOC-CE-003') || unit.includes('SOC-CE-03')) return 'Fortaleza';
+  if (unit.includes('SOC-SP35')) return 'Piracicaba';
+  if (unit.includes('SOC-ES02') || unit.includes('SOC-ES2')) return 'Viana';
+  if (unit.includes('SOC-PE-04')) return 'Jaboatão dos Guararapes';
+  return 'São Paulo';
+}
+
+// Regional normalization
+function normalizeRegional(regional: string, unit: string, cidade: string): string {
+  const r = (regional || '').trim();
+  if (r && r !== 'Cadastrar unidade') {
+    return r;
+  }
+  if (unit.includes('SOC-SP06') || unit.includes('SOC-SP18') || unit.includes('SOC-SP35')) return 'Sudeste SP';
+  if (unit.includes('LAM-002')) return 'Nordeste 03';
+  if (unit.includes('SOC-CE-003') || unit.includes('SOC-CE-03')) return 'Nordeste 04';
+  if (unit.includes('SOC-ES02') || unit.includes('SOC-ES2')) return 'Espirito Santo';
+  if (unit.includes('SOC-PE-04')) return 'Nordeste 01';
+  return 'Sudeste SP';
+}
+
+const lines = rawData.trim().split('\n').slice(1);
+
+const incidents = lines.map((line, idx) => {
+  const cols = line.split('\t');
+  const regId = cols[0].trim();
+  const rawDate = cols[1]?.trim() || '';
+  const dateFormatted = parseDatePt(rawDate);
+  const rawUnit = cols[2]?.trim() || '';
+  const unit = normalizeUnit(rawUnit);
+  const rawCity = cols[3]?.trim() || '';
+  const city = normalizeCity(rawCity, unit);
+  const rawRegional = cols[4]?.trim() || '';
+  const regional = normalizeRegional(rawRegional, unit, city);
+  const macroRegion = getMacroRegion(regional, '', city);
+
+  const solicitante = cols[5]?.trim() || 'Equipe Facilities';
+  const descricao = cols[6]?.trim() || '';
+  const impacto = cols[7]?.trim() || 'Parcial';
+  const sistema = cols[8]?.trim() || 'Elétrico';
+  const criticidadeNum = parseInt(cols[9]?.trim() || '2', 10);
+  const criticidade = (criticidadeNum >= 1 && criticidadeNum <= 5 ? criticidadeNum : 2) as 1 | 2 | 3 | 4 | 5;
+  const fornecedor = cols[10]?.trim() || 'Equipe Interna Facilities';
+  const detalheOcorrencia = cols[11]?.trim() || '';
+  const horaAbertura = formatTime(cols[12]);
+  const horaAcionamento = formatTime(cols[13]);
+  const horaNormalizacao = formatTime(cols[14]);
+  const status = 'Encerrado';
+  const manusis = (cols[17]?.trim() || '').replace(/\s+/g, ' ');
+  const protocolo = manusis || regId;
+  const mttaMin = parseTimeToMinutes(cols[18]);
+  const mttrH = parseTimeToHours(cols[19]);
+  const slaText = (cols[20]?.trim() || 'Dentro SLA').includes('Dentro') ? 'Dentro SLA' : 'Fora SLA';
+  const slaGerencial = slaText === 'Dentro SLA' ? 'Dentro do SLA' : 'Fora do SLA';
+  const tempoAbertoH = parseTimeToHours(cols[22]);
+  const alertaSla = cols[23]?.trim() || (slaText === 'Dentro SLA' ? 'No prazo' : 'ESTOURADO');
+  const causaRaiz = cols[24]?.trim() || 'Em investigação';
+  const acaoExecutada = cols[25]?.trim() || detalheOcorrencia || 'Atendimento realizado conforme procedimento operacional';
+  const respAcomp = cols[26]?.trim() || 'CCM Operações';
+  const reincidenciaCount = parseInt(cols[27]?.trim() || '0', 10) || 0;
+  const reincidente = reincidenciaCount > 0 ? 'Sim' : 'Não';
+  const dataEncerramento = cols[28]?.trim() ? parseDatePt(cols[28].trim()) : dateFormatted;
+
+  const isCd = unit.startsWith('SOC') || unit.startsWith('FULL') || unit.startsWith('CD');
+  const tipoUnidade = isCd ? 'CD' : 'HUB';
+
+  let faixaCrit = 'C2 - Alta';
+  if (criticidade === 1) faixaCrit = 'C1 - Emergência';
+  else if (criticidade === 2) faixaCrit = 'C2 - Alta';
+  else if (criticidade === 3) faixaCrit = 'C3 - Média';
+  else if (criticidade === 4) faixaCrit = 'C4 - Baixa';
+
+  const slaHorasLimite = criticidade === 1 ? 4 : criticidade === 2 ? 12 : criticidade === 3 ? 24 : 48;
+
+  // Equipment derivation
+  let equipamento = 'Equipamento Geral';
+  const dLow = descricao.toLowerCase();
+  if (dLow.includes('gerador') || dLow.includes('qta')) equipamento = 'Grupo Gerador Diesel';
+  else if (dLow.includes('niveladora') || dLow.includes('doca')) equipamento = 'Niveladora Eletro-Hidráulica';
+  else if (dLow.includes('portão') || dLow.includes('portao')) equipamento = 'Portão Deslizante Automatizado';
+  else if (dLow.includes('quadro') || dLow.includes('disjuntor') || dLow.includes('dr')) equipamento = 'Quadro Geral de Distribuição (QGBT)';
+  else if (dLow.includes('água') || dLow.includes('caixa de gordura') || dLow.includes('ralo') || dLow.includes('bebedouro')) equipamento = 'Sistema Hidráulico Predial';
+  else if (dLow.includes('climatização') || dLow.includes('aspersor') || dLow.includes('ventilador')) equipamento = 'Sistema de Climatização / Aspersão';
+  else if (dLow.includes('esteira')) equipamento = 'Esteira Transportadora';
+  else if (dLow.includes('luminária') || dLow.includes('iluminação') || dLow.includes('refletor')) equipamento = 'Circuito de Iluminação LED';
+  else if (dLow.includes('rack') || dLow.includes('internet') || dLow.includes('nobreak')) equipamento = 'Infraestrutura de TI / Nobreak';
+
+  return {
+    id_automatico: regId,
+    id: regId,
+    protocolo: protocolo,
+    data: dateFormatted,
+    unidade: unit,
+    cidade: city,
+    regiao: macroRegion,
+    regional: regional,
+    solicitante: solicitante,
+    solicitante_cargo: 'Analista de Operações / SL',
+    descricao_ocorrencia: descricao,
+    descricao: descricao,
+    impacto_operacional: impacto,
+    sistema: sistema,
+    categoria: sistema,
+    criticidade: criticidade,
+    faixa_criticidade: faixaCrit,
+    fornecedor: fornecedor,
+    acao_executada: acaoExecutada,
+    hora_abertura: horaAbertura,
+    hora_acionamento: horaAcionamento,
+    hora_normalizacao: horaNormalizacao,
+    data_hora_abertura: `${dateFormatted}T${horaAbertura}`,
+    data_hora_acionamento: `${dateFormatted}T${horaAcionamento}`,
+    data_hora_normalizacao: `${dataEncerramento}T${horaNormalizacao}`,
+    status: 'Encerrado',
+    status_gerencial: 'Encerrado',
+    valor_spot: 0,
+    numero_manusis: manusis || protocolo,
+    mtta_min: mttaMin,
+    mttr_h: mttrH,
+    sla: slaText,
+    sla_gerencial: slaGerencial,
+    semaforo_sla: slaText === 'Dentro SLA' ? 'Verde' : 'Vermelho',
+    tempo_em_aberto_h: tempoAbertoH,
+    alerta_sla: alertaSla,
+    prioridade_alerta: slaText === 'Dentro SLA' ? 1 : 4,
+    causa_raiz: causaRaiz,
+    acao_preventiva: acaoExecutada,
+    responsavel_acompanhamento: respAcomp,
+    reincidencia_30d: reincidenciaCount,
+    reincidente: reincidente,
+    equipamento_afetado: equipamento,
+    tipo_unidade: tipoUnidade,
+    tipo_manutencao: criticidade === 1 ? 'Corretiva Emergencial' : 'Corretiva',
+    prioridade: criticidade === 1 ? 'Crítica' : criticidade === 2 ? 'Alta' : 'Média',
+    sla_horas_limite: slaHorasLimite,
+    tempo_resolucao_horas: mttrH,
+    sla_status: 'Encerrado',
+    custo_estimado: criticidade === 1 ? 2500 : 1200,
+    custo_real: 0,
+    tecnico_responsavel: fornecedor,
+    data_fechamento: `${dataEncerramento}T${horaNormalizacao}`
+  };
+});
+
+console.log('Total incidents transformed:', incidents.length);
+console.log('First incident:', incidents[0].id, incidents[0].unidade, incidents[0].regiao);
+console.log('Last incident:', incidents[78].id, incidents[78].unidade, incidents[78].regiao);
+
+const tsContent = `import { Incident } from '../types/facilities';
+
+export const REAL_CONTINGENCY_INCIDENTS: Incident[] = ${JSON.stringify(incidents, null, 2)};
+`;
+
+fs.writeFileSync('./src/data/realContingencyIncidents.ts', tsContent, 'utf8');
+console.log('Saved src/data/realContingencyIncidents.ts successfully!');

@@ -1,0 +1,6 @@
+{
+  "name": "Shopee Facilities Intelligence - Power BI & Operations Portal",
+  "description": "Painel executivo e operacional de gestão de ocorrências de Facilities, indicadores de SLA, custos de manutenção, medidas DAX, automação e base de dados dos Hubs e CDs Shopee.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

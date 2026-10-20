@@ -1,0 +1,58 @@
+
+  <svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#EE4D2D" />
+        <stop offset="100%" stop-color="#FF5722" />
+      </linearGradient>
+      <linearGradient id="bagGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#ffffff" />
+        <stop offset="100%" stop-color="#fff5f2" />
+      </linearGradient>
+      <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+        <feDropShadow dx="0" dy="1.28" stdDeviation="1.28" flood-opacity="0.25"/>
+      </filter>
+    </defs>
+
+    <!-- Background -->
+    <rect width="64" height="64" rx="14.08" fill="url(#bgGrad)" />
+
+    <!-- Center Content -->
+    <g transform="translate(5.12, 5.12)" filter="url(#shadow)">
+      <!-- Handle of the bag -->
+      <path d="
+        M 18.816 15.052800000000001
+        C 18.816 6.451199999999999,
+          34.944 6.451199999999999,
+          34.944 15.052800000000001
+      " fill="none" stroke="#ffffff" stroke-width="3.2255999999999996" stroke-linecap="round" />
+
+      <!-- Bag body -->
+      <path d="
+        M 11.8272 15.052800000000001
+        L 41.9328 15.052800000000001
+        L 45.15839999999999 47.3088
+        Q 45.15839999999999 50.5344 40.8576 50.5344
+        L 12.902399999999998 50.5344
+        Q 8.6016 50.5344 8.6016 47.3088
+        Z
+      " fill="url(#bagGrad)" />
+
+      <!-- The 'S' of Shopee inside bag -->
+      <path d="
+        M 31.180799999999998 23.6544
+        C 31.180799999999998 20.4288, 22.579199999999997 20.4288, 22.579199999999997 25.804799999999997
+        C 22.579199999999997 31.180799999999998, 32.256 30.105600000000003, 32.256 37.632
+        C 32.256 44.0832, 21.504 44.0832, 21.504 39.782399999999996
+      " fill="none" stroke="#EE4D2D" stroke-width="3.4944" stroke-linecap="round" stroke-linejoin="round" />
+
+      <!-- Small Facilities gear / spark badge -->
+      <circle cx="40.8576" cy="41.9328" r="6.451199999999999" fill="#172554" />
+      <path d="
+        M 39.2448 41.9328
+        L 40.32 43.5456
+        L 42.4704 40.32
+      " fill="none" stroke="#ffffff" stroke-width="1.344" stroke-linecap="round" stroke-linejoin="round" />
+    </g>
+  </svg>
+  
